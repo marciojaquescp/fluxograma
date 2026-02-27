@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluxograma de Montagem de Eventos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        slate: {
+                            850: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'pulse-subtle': 'pulseSubtle 3s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseSubtle: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.8' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Flowchart Custom Styling */
+        .flowchart-container {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .flowchart-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, #2563eb, #f59e0b, transparent);
+            transform: translateX(-50%);
+        }
+
+        @media (max-width: 768px) {
+            .flowchart-line {
+                left: 20px;
+            }
+        }
+
+        .day-card {
+            position: relative;
+            width: 45%;
+            margin-bottom: 3rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .day-card:nth-child(even) {
+            margin-left: auto;
+        }
+
+        .day-card:nth-child(odd) {
+            margin-right: auto;
+        }
+
+        .node-dot {
+            position: absolute;
+            top: 24px;
+            width: 16px;
+            height: 16px;
+            background: #2563eb;
+            border: 4px solid #020617;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .day-card:nth-child(odd) .node-dot {
+            right: -calc(10% + 8px); /* Adjust based on width/alignment */
+            right: -11.5%;
+        }
+
+        .day-card:nth-child(even) .node-dot {
+            left: -11.5%;
+        }
+
+        @media (max-width: 768px) {
+            .day-card {
+                width: calc(100% - 50px);
+                margin-left: 50px !important;
+                margin-right: 0 !important;
+            }
+            .node-dot {
+                left: -38px !important;
+            }
+        }
+
+        .resource-tag {
+            background: rgba(37, 99, 235, 0.15);
+            color: #60a5fa;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .task-item::before {
+            content: "→";
+            margin-right: 8px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .status-show-badge {
+            background: #f59e0b !important;
+            color: #020617 !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-body antialiased min-h-screen pb-12">
+
+    <!-- Header Section -->
+    <header class="max-w-6xl mx-auto px-6 pt-12 pb-8 text-center animate-fade-in-up">
+        <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-amber-400">
+            Fluxograma de Montagem de Eventos
+        </h1>
+        
+        <div class="flex flex-wrap justify-center gap-4 text-slate-400 font-display text-lg md:text-xl">
+            <div class="flex items-center gap-2 px-4 py-2 rounded-full glass-panel">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span class="font-semibold text-slate-200">Evento:</span>
+                <span>Show Guns n Rose</span>
+                <span class="font-semibold text-slate-200">Data:</span>
+                <span>23/03/26 até 03/04/26</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 rounded-full glass-panel">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span class="font-semibold text-slate-200">Localização:</span>
+                <span>Jockey Club do Rio Grande do Sul</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto px-4 md:px-6">
+        
+        <!-- Flowchart Container -->
+        <section class="glass-panel rounded-3xl p-6 md:p-12 mb-12 overflow-hidden">
+            <div class="flex flex-col items-center mb-12">
+                <h2 class="font-display text-2xl font-semibold mb-2">Roteiro de Logística Técnica e Infraestrutura</h2>
+                <div class="h-1 w-24 bg-gradient-to-r from-blue-600 to-amber-500 rounded-full"></div>
+            </div>
+
+            <div class="flowchart-container scroll-container overflow-x-auto">
+                <div class="flowchart-line hidden md:block"></div>
+                
+                <div class="flex flex-col relative">
+                    
+                    <!-- Dia 1 -->
+                    <div class="day-card group">
+                        <div class="node-dot hidden md:block group-hover:scale-125 transition-transform"></div>
+                        <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-blue-500 hover:bg-slate-800/80 transition-all">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-blue-600/20 text-blue-400 rounded-lg text-sm font-bold uppercase tracking-wider">Dia 1</span>
+                                <span class="resource-tag">2 Eletricistas</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Configuração e logística</h3>
+                            <ul class="space-y-2 text-slate-400 text-sm">
+                                <li class="task-item">Logística de todos os materiais</li>
+                                <li class="task-item">Iniciar a montagem de produção</li>
+                                <li class="task-item">Organize o recipiente de material</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dia 2 -->
+                    <div class="day-card group">
+                        <div class="node-dot hidden md:block group-hover:scale-125 transition-transform"></div>
+                        <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-blue-400 hover:bg-slate-800/80 transition-all">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm font-bold uppercase tracking-wider">Dia 2</span>
+                                <span class="resource-tag">4 Eletricistas</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Aterramento e serviço</h3>
+                            <ul class="space-y-2 text-slate-400 text-sm">
+                                <li class="task-item">Aterragem do palco e das tendas</li>
+                                <li class="task-item">Instalação de iluminação de serviço</li>
+                                <li class="task-item">Configuração provisória de iluminação de palco</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dia 3 -->
+                    <div class="day-card group">
+                        <div class="node-dot hidden md:block group-hover:scale-125 transition-transform"></div>
+                        <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-indigo-500 hover:bg-slate-800/80 transition-all">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg text-sm font-bold uppercase tracking-wider">Dia 3</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Distribuição e SPDA</h3>
+                            <ul class="space-y-2 text-slate-400 text-sm">
+                                <li class="task-item">Distribuição de painéis (quadros)</li>
+                                <li class="task-item">Aterramento de pontos de acesso</li>
+                                <li class="task-item">SPDA (Sistema de Proteção contra Raios)</li>
+                                <li class="task-item">Comece a iluminação: bares, tendas e fachadas.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dia 4 -->
+                    <div class="day-card group">
+                        <div class="node-dot hidden md:block group-hover:scale-125 transition-transform"></div>
+                        <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-purple-500 hover:bg-slate-800/80 transition-all">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-sm font-bold uppercase tracking-wider">Dia 4</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Infraestrutura concluída</h3>
+                            <ul class="space-y-2 text-slate-400 text-sm">
+                                <li class="task-item">Início da montagem da cozinha</li>
+                                <li class="task-item">Aterramento de todas as barricadas</li>
+                                <li class="task-item">Configuração de ativação</li>
+                                <li class="task-item">Iluminação para banheiros e acessos</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dia 5 -->
+                    <div class="day-card group">
+                        <div class="node-dot hidden md:block group-hover:scale-125 transition-transform"></div>
+                        <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-teal-500 hover:bg-slate-800/80 transition-all">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-teal-500/20 text-teal-300 rounded-lg text-sm font-bold uppercase tracking-wider">Day 5</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Integridade do Sistema</h3>
+                            <ul class="space-y-2 text-slate-400 text-sm">
+                                <li class="task-item">Testes abrangentes de todos os sistemas</li>
+                                <li class="task-item">Balanceamento de carga e verificação de circuitos</li>
+                                <li class="task-item">Aprovação de segurança</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dia 6 -->
+                    <div class="day-card group">
+                        <div class="node-dot hidden md:block group-hover:scale-125 transition-transform"></div>
+                        <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/10 transition-all border-amber-500/30">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 status-show-badge rounded-lg text-sm font-bold uppercase tracking-wider animate-pulse-subtle">Dia 6</span>
+                                <span class="text-amber-500 text-xs font-bold flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span> LIVE EVENT
+                                </span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">Show Day</h3>
+                            <ul class="space-y-2 text-slate-400 text-sm">
+                                <li class="task-item">Suporte técnico para reparos emergenciais</li>
+                                <li class="task-item">Monitoramento do sistema em tempo real</li>
+                                <li class="task-item">A desmontagem começa após a finalização do evento</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dia 7 -->
+                    <div class="day-card group">
+                        <div class="node-dot hidden md:block group-hover:scale-125 transition-transform"></div>
+                        <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-rose-500 hover:bg-slate-800/80 transition-all">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-3 py-1 bg-rose-500/20 text-rose-300 rounded-lg text-sm font-bold uppercase tracking-wider">Dia 7</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3 text-white">After Show</h3>
+                            <ul class="space-y-2 text-slate-400 text-sm">
+                                <li class="task-item">Desmontagem final de todas as estruturas</li>
+                                <li class="task-item">Inventário e carregamento de materiais</li>
+                                <li class="task-item">Inspeção e liberação do local</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Notes Section -->
+        <section class="animate-fade-in-up" style="animation-delay: 0.3s;">
+            <div class="glass-panel rounded-3xl p-8 border-t-4 border-t-amber-500/50">
+                <div class="flex items-center gap-3 mb-4">
+                    <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="font-display text-xl font-bold">Notas Específicas do Evento</h3>
+                </div>
+                <div class="prose prose-invert max-w-none">
+                    <p class="text-slate-400 leading-relaxed">
+                        Assegure-se de que todos os protocolos de segurança sejam rigorosamente seguidos durante a transição entre os testes do 5º dia e as operações do show do 6º dia. As listas de contatos de emergência de todos os responsáveis técnicos devem ser distribuídas antes do início do 1º dia.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Optional: Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.day-card').forEach((card, index) => {
+            card.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700');
+            card.style.transitionDelay = `${index * 100}ms`;
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
+
